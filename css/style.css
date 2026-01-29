@@ -1,0 +1,1072 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+@font-face { /* hook */
+  font-family: 'Taipei Sans TC Beta Bold';
+  src: url('/assets/fonts/TaipeiSansTCBetaBold/Taipei\ Sans\ TC\ Beta\ Bold.ttf') format('woff2'),
+}
+@font-face { /* description */
+  font-family: 'Geist Mono';
+  src: url('/assets/fonts/GeistMono/webfonts/GeistMono-Regular.woff2') format('woff2'),
+}
+@font-face { /* title 1 */
+  font-family: 'Geist Regular';
+  src: url('/assets/fonts/Geist/webfonts/Geist-Regular.woff2') format('woff2');
+}
+@font-face { /* title 2 */
+  font-family: 'Geist Medium';
+  src: url('/assets/fonts/Geist/webfonts/Geist-Medium.woff2') format('woff2');
+}
+@font-face { /* title 3 */
+  font-family: 'Geist Bold';
+  src: url('/assets/fonts/Geist/webfonts/Geist-Bold.woff2') format('woff2');
+}
+
+
+body{
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  background-color: #08415C;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  color: #EAEAEA;
+}
+
+.page-wrap {
+  margin: 0 6vw;
+}
+
+body::-webkit-scrollbar {
+  display: none;
+}
+
+html, body {
+  height: 100%;
+}
+
+#overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4); /* subtle dark fade */
+  opacity: 0;
+  pointer-events: none; /* not clickable by default */
+  transition: opacity 0.4s ease;
+  z-index: 1500; /* sits below .contacts but above everything else */
+}
+
+#overlay.active {
+  opacity: 1;
+  pointer-events: all; /* becomes clickable when visible */
+  backdrop-filter: blur(4px);
+}
+
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 8vw; /* fluid horizontal padding */
+}
+
+nav {
+  display: flex;
+  flex-direction: row;
+  margin-top: 40px;
+  justify-content: space-between;
+  align-items: flex-end;
+  
+}
+
+nav button:first-child {
+  margin-right: 2vw;
+}
+
+
+button {
+  border: none;
+  background-color: transparent;
+  color: #EAEAEA;
+  font-family: 'Geist';
+  font-size: clamp(10px, 1vw, 12px);;
+}
+
+nav button {
+  font-family: 'Geist Medium';
+  font-size: clamp(12px, 1vw, 16px);
+}
+
+main {
+  display: flexbox;
+  flex: 1;
+  padding: 60px 0px 60px 0px;
+}
+
+#reel {
+  position: absolute;
+  top: 680px;
+  padding-left: 6vw;
+  border: 1px solid #EAEAEA;
+  border-radius: 100px;
+  padding: 3px 24px 3px 24px;
+  font-family: 'Taipei Sans TC Beta Bold';
+  transition: 0.6s ease-out;
+}
+
+#reel:hover{
+  background-color: #08A4BD;
+  border-color: #08A4BD;
+  transition: 0.6s ease-in;
+}
+
+.projects {
+  display: flex;
+  flex-direction: row;
+  margin: 48px 0px 40px 0px;
+  gap: 24px;
+}
+
+.categories {
+  display: flex;
+  flex-direction: column;
+  justify-items: flex-start;
+  position: sticky;
+  left: 60px;
+  top: 60px;
+  max-height: calc(100% - 40px);
+  overflow-y: auto;
+}
+
+
+.categories > button{
+  text-align: left;
+  margin: 0px 60px 20px 0px;
+  font-family: 'Geist Regular';
+  opacity: 30%;
+  transition: 0.6s ease-out;
+}
+
+.categories > button:hover{
+  opacity: 100%;
+  transition: 0.6s ease-in;
+}
+
+#categoriesFirst {
+  font-family: 'Geist Bold';
+  opacity: 100%;
+}
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); 
+  gap: 3rem;
+  flex: 1;
+}
+
+.gallery img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+p {
+  font-size: clamp(10px, 1vw, 12px);
+}
+
+.gallery a {
+  text-decoration: unset;
+}
+
+.projectDetailMain {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; 
+  align-items: flex-start; 
+  gap: 100px; 
+}
+
+
+.projectNav {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start; 
+  min-width: 100%;
+  margin-top: 100px;
+}
+
+.projectNav img {
+  height: 12px;
+}
+
+.nextwork img{
+  margin-left: 20px;
+}
+
+.projectNav button {
+  font-size: clamp(12px, 1vw, 16px);
+  margin-left: 20px;
+}
+
+
+.nextwork button, .previouswork button {
+  opacity: 0%;
+  transition: 0.6s ease-out;
+  font-family: 'Geist Mono';
+}
+
+.nextwork:hover button,
+.previouswork:hover button {
+  opacity: 100%;
+  transition: 0.6s ease-in;
+}
+
+.finalproject video {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  display: block;
+}
+
+
+.individualProjectContent {
+  display: flex;
+  justify-content: space-between; 
+  align-items: flex-start;
+  gap: 2rem;
+}
+
+.introduction {
+  flex: 0.5;
+}
+
+.finalproject {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+
+.individualProjectContentpdf{
+  display: flex;  
+  position: relative;
+  justify-content: space-between; 
+  align-items: flex-start;
+  gap: 2rem;
+  width: 100%;
+  flex-wrap: wrap; 
+} 
+
+.individualProjectContentpdf .introduction {
+  flex: 0.5;
+  min-width: 300px;
+}
+
+.individualProjectContentpdf .pdfviewer {
+  flex: 1;
+  width: 100%;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  min-height: 200px;
+}
+
+.individualProjectContent,
+.individualProjectContentpdf {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 2rem; /* ensures consistent spacing */
+  width: 100%;
+  flex-wrap: wrap; /* ✅ allows stacking on small screens */
+}
+
+.individualProjectContent .introduction,
+.individualProjectContentpdf .introduction {
+  flex: 0.5;
+  min-width: 280px; /* so intro doesn’t vanish on mobile */
+}
+
+.finalproject,
+.pdfviewer {
+  flex: 1;
+  min-width: 320px; /* ensures visibility */
+  aspect-ratio: 16 / 9;
+}
+
+
+
+
+
+.introduction > p {
+  text-align: left;
+  margin: 0px 16px 16px 0px;
+  opacity: 30%;
+  transition: 0.6s ease-out;
+  font-size: clamp(12px, 1vw, 16px);
+  word-wrap: break-word;
+}
+
+#introtitle {
+  font-family: 'Geist Bold';
+  opacity: 100%;
+}
+
+#introdescription {
+  margin-top: 20px;
+  font-family: 'Geist Mono';
+  opacity: 100%;
+  max-width: 80%;
+}
+
+
+.pdfviewer {
+ position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  margin: 0 auto;
+  background: #000;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+}
+
+.pdfviewer canvas {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  max-width: 100%;
+  max-height: 100%;
+  position: relative; /* remove absolute locking */
+  display: block;
+  transition: opacity 0.5s ease;
+}
+
+/* Center both canvases perfectly */
+#pdf-canvas-current,
+#pdf-canvas-next {
+  position: absolute;
+  inset: 0; /* replaces top/left/transform */
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: opacity 0.5s ease;
+  display: block;
+}
+
+/* Start with next canvas invisible */
+#pdf-canvas-next {
+  opacity: 0;
+}
+
+
+#pdf-controls {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; 
+  z-index: 20; 
+}
+
+#pdf-controls img {
+  pointer-events: auto;
+  transition: opacity 0.15s ease, filter 0.15s ease;
+  opacity: 0.9; 
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.7)); 
+}
+
+/* Positioning overrides */
+#prev-page,
+#next-page,
+#download-pdf,
+#fullscreen-pdf {
+  z-index: 25; 
+}
+
+
+/* Positioning */
+#download-pdf {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+}
+#fullscreen-pdf {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  z-index: 10;
+}
+#prev-page {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  z-index: 10;
+}
+#next-page {
+  position: absolute;
+  bottom: 10px;
+  left: 80px;
+  z-index: 10;
+}
+
+#prev-page.disabled,
+#next-page.disabled {
+  opacity: 0.4 !important;
+  pointer-events: none;
+  cursor: default;
+  transition: none !important; /* no fade */
+}
+
+
+/* ---- PDF Thumbnails ---- */
+/* ---- PDF Thumbnails ---- */
+#pdf-thumbnails {
+  position: absolute;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  background: rgba(245, 245, 245, 0.5);
+  padding: 10px 12px;
+  border: rgba(176, 176, 176, 0.5) 2px solid ;
+  border-radius: 12px;
+  backdrop-filter: blur(6px);
+  z-index: 20;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+/* visible state */
+#pdf-thumbnails.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#pdf-thumbnails {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+#pdf-thumbnails.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Invisible hover zone to trigger thumbnails */
+#thumb-hover-zone {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 80px; /* adjust: 60–100px works well */
+  z-index: 19; /* just below the thumbnails themselves */
+  pointer-events: auto;
+}
+
+
+.pdf-thumb {
+  width: 120px;
+  height: auto;
+  border-radius: 6px;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: transform 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 0 6px rgba(0,0,0,0.3);
+}
+
+.pdf-thumb:hover {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+.pdf-thumb.active {
+  border: 3px solid #08A4BD;
+  opacity: 1;
+  transform: scale(1.08);
+  box-shadow: 0 0 10px rgba(8,164,189,0.6);
+}
+
+
+
+
+
+.contacts button {
+  color: #08415C;
+}
+
+.contacts.active {
+  background-color: #EAEAEA;
+  right: 0px;
+  transition: 600ms ease-in;
+  visibility: visible;
+}
+
+.contacts {
+  position: fixed;
+  right: -36%;
+  min-width: 30%;
+  background-color: #EAEAEA;
+  color: #08415C;
+  visibility: hidden;
+  padding: 0px 40px 40px 40px;
+  height: 100%;
+  background-color: #fff;
+  transform: translateX(100%); 
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: 1400ms ease-in-out;
+  z-index: 2000;
+}
+
+.contacts.active {
+  transform: translateX(0);
+  transition: 1200ms ease-out;
+}
+
+.contactsTitle {
+  display: flex;
+  flex-direction: row;
+  margin-top: 40px;
+  justify-content: space-between;
+  text-align: end;
+  font-size: 24px;
+}
+
+.contacts .pageNav, .contacts .close-btn {
+  margin-top: 10px;
+
+}
+
+#contactClose {
+  font-size: clamp(12px, 1vw, 24px);
+}
+
+
+
+.contactFormSpace {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end; /* 👈 keeps form lower */
+  height: 100%; /* ensures it fills the contacts panel */
+}
+
+.roseEmail {
+  margin-bottom: 140px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.contactForm {
+  display: flex;
+  align-items: flex-start; /* ensures label stays top-aligned with textarea */
+  justify-content: space-between;
+  width: 100%;
+  gap: 1rem;
+}
+
+label {
+  font-family: 'Geist Mono';
+  font-size: clamp(16px, 1vw, 20px);;
+}
+
+input, textarea {
+  top: fixed;
+  color: #08A4BD;
+  border: none;
+  border-radius: 0px;
+  max-width: 24ch;
+  font-size: clamp(12px, 1vw, 20px);
+  font-family: 'Geist Mono';
+  text-align: right;
+  background-color: transparent;
+  resize: none;
+  opacity: 0.6;
+  field-sizing: content;
+  max-height: calc(1.5em * 6); 
+  overflow-y: auto;
+}
+
+textarea {
+    resize: none;
+  overflow-y: auto;     /* scroll inside textarea */
+  height: calc(1.5em * 5); /* roughly 5 lines tall */
+  field-sizing: content;   /* optional, doesn’t hurt */
+}
+
+
+
+input:focus, textarea:focus {
+  outline: none;
+  opacity: 1;
+}
+
+/* base placeholder style */
+input::placeholder,
+textarea::placeholder {
+  color: #08A4BD;
+  transition: color 1s ease; /* smooth fade */
+}
+
+/* temporary red placeholder */
+input.error::placeholder,
+textarea.error::placeholder {
+  color: red;
+}
+
+/* shake (dribble) animation */
+@keyframes shake {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+  100% { transform: translateX(0); }
+}
+
+input.shake,
+textarea.shake {
+  animation: shake 0.4s ease;
+}
+
+/* autofilled state */
+input:-webkit-autofill,
+textarea:-webkit-autofill {
+  -webkit-text-fill-color: #08A4BD !important; /* text color */
+  background-clip: padding-box !important; /* ensure box-shadow only covers content area */
+  background-color: transparent !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+}
+
+.contactSubmitButton {
+  display: inline-block;
+  padding: 2px;
+  width: auto;
+  text-align: center;
+  margin-left: unset;
+  border: solid black 2px;
+  border-width: auto;
+  font-family: 'Taipei Sans TC Beta Bold';
+  font-size: 20px;
+
+  width: fit-content;         /* ✅ border fits text width */
+  padding: 2px 6px;           /* minimal inner space */
+  background: transparent;
+  cursor: pointer;
+    transition: all 0.6s ease; /* 👈 smooth transition */
+}
+
+.contactSubmitButton:hover {
+  background-color: #08A4BD;
+  color: white;
+  border-color: #08A4BD;
+}
+
+
+
+
+
+
+
+.finalproject .controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+  color: white;
+  box-sizing: border-box;
+  font-size: clamp(10px, 1vw, 12px);;
+}
+
+.finalproject .controls button {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: clamp(10px, 1vw, 12px);;
+  padding: 4px 6px;
+}
+
+.finalproject .controls img {
+  height: 24px;
+}
+
+.finalproject .controls input[type="range"] {
+  cursor: pointer;
+  width: 60px; /* fits small width */
+}
+
+.progress-container {
+  flex: 1;
+  margin: 0 6px;
+  height: 6px;
+  border-radius: 30px;
+  background: #555;
+  position: relative;
+  cursor: pointer;
+}
+
+.progress {
+  width: 0%;
+  height: 100%;
+  border-radius: 100px;
+  background: #f00;
+}
+
+.video-container {      
+  position: relative;
+  max-width: 100%;
+}
+
+/* Normal video container */
+.video-container {
+  position: relative;
+  display: inline-block;
+  min-width: 100%;
+}
+
+/* Fake fullscreen mode */
+.video-container.fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;   /* force stretch */
+  bottom: 0;  /* force stretch */
+  max-width: none;
+  width: 100%;
+  background: black;
+  object-fit: contain;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.video-container.fullscreen video {
+  width: 100%;
+  position: fixed;
+  top: auto;
+  left: 0;
+  right: 0;   /* force stretch */
+  bottom: auto;  /* force stretch */
+  object-fit: contain; /* keeps aspect ratio */
+}
+
+
+.controls {                     
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  opacity: 0;                  
+  transition: opacity 0.3s ease;
+}
+
+.controls img {
+    margin: 0 2px;
+}
+
+#timeDisplay {
+  font-size: clamp(10px, 1vw, 12px); 
+  font-family: 'Geist'; 
+  color: #EAEAEA; 
+  margin: 0px 4px;
+}
+
+.video-container.fullscreen .controls {
+  width: 100%;
+  left: 0;
+  right: 0;
+  padding: 12px;
+  opacity: 0;
+  background: rgba(0, 0, 0, 0.5); /* slightly darker in fullscreen */
+  transition: opacity 0.3s ease;
+}
+
+.video-container.fullscreen .controls:hover {
+  opacity: 1;
+}
+
+
+/* Normal mode: only show on hover */
+.video-container .controls {
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 2;
+}
+
+.video-container:hover .controls {
+  opacity: 1;
+}
+
+/* Fullscreen mode: JS handles opacity */
+.video-container.fullscreen .controls {
+  opacity: 0;
+}
+
+
+
+
+.icon-Arrow-2-Stroke:before {
+  content: "\e900";
+  color: #eaeaea;
+}
+
+
+footer {
+  display: flex;
+  flex-direction: column;
+  background-color: #082e40;
+  padding: 100px 6vw 40px 6vw;
+  gap: 20px;
+  width: 100%;
+}
+
+footer p, a {
+  font-size: 20px;
+  text-decoration: none;
+}
+
+footer a {
+  color: inherit;      
+  text-decoration: none;
+}
+
+.footerTop {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  margin: 0;
+}
+
+.roseLamIcon {
+  flex: 0 0 20%;
+  height: 100%;
+}
+
+.socialsdiv {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: row;
+  margin-top: auto;
+  margin-right: auto;
+}
+
+.socialsdiv a {
+  margin-left: auto;
+}
+
+.socialsdiv img{
+  width: 24px;
+  margin-right: 10px;
+}
+
+.justSpace {
+  flex: 1;
+}
+
+
+hr {
+  border: none;
+  height: 1px;  
+  width: 30%;    
+  background-color: white;  
+  margin-bottom: 0px;
+}
+
+.legaldiv {
+  display: flex;
+  flex-direction: column;
+  margin-top: 0;
+  text-align: right;
+  margin-top: auto;
+}
+
+.legaldiv a, .legaldiv p {
+  font-size: 12px;
+}
+
+.legaldivv {
+  display: flex;
+  margin-top: auto;
+}
+
+.legaldivv a{
+  text-align: right;
+  margin-left: 20px;
+  font-size: 12px;
+}
+
+
+
+.footerBottom {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.footerBottom p {
+  font-size: 12px;
+}
+
+
+
+/*
+* {
+  border: 1px solid red; /* Outline every element */
+
+
+
+@media (max-width: 860px) {
+  .individualProjectContent,
+  .individualProjectContentpdf {
+    flex-direction: column;
+  }
+
+  .introduction,
+  .finalproject,
+  .pdfviewer {
+    width: 100%;
+    flex: none;
+    max-width: 100%;
+    overflow-wrap: auto;
+  }
+
+  #introdescription {
+    max-width: 100%;
+
+
+  }
+  .pdfviewer {
+    aspect-ratio: 16 / 9; /* keep ratio consistent */
+    height: auto;
+  }
+
+
+  .projectNav {
+    position: sticky;
+    top: 0;
+    padding-top: 100px;
+    margin-top: 0;
+    outline: #08415C 10px solid;
+    z-index: 100; /* Ensure it stays on top of all scrolling content */
+    background-color: #08415C;
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px); /* For Safari */
+
+  }
+
+  .content-area {
+      /* This must be equal to or greater than the height of .work-nav */
+      display: block;
+      height: 100px; 
+      width: 90vw;
+      position: sticky;
+      top: 125px;
+      max-width: 100vw;
+      z-index: 200;
+      background: #08415C;
+    background: linear-gradient(360deg, rgba(8, 65, 92, 0) 0%, rgba(8, 65, 92, 1) 83%);   
+    }
+
+
+  footer {
+    display: block;
+    min-height: 300px;
+    width: 100vw;
+    background-color: #000;
+  }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+/* Basic Modal Styling */
+.modal-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center;
+  z-index: 1000;
+}
+.login-card {
+  background: white; padding: 2rem; border-radius: 12px;
+  display: flex; flex-direction: column; gap: 1rem; width: 300px;
+}
+.login-card input { padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+.login-card button { 
+  padding: 10px; background: #333; color: white; border: none; cursor: pointer; 
+}
+.close-txt { background: none !important; color: #666 !important; font-size: 0.8rem; }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* testing */
+#projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+    padding: 2rem;
+}
+
+.project-card {
+    border: 1px solid #eee;
+    padding: 1.5rem;
+    border-radius: 8px;
+    background: #fff;
+    transition: transform 0.2s;
+}
+
+.project-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}

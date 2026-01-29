@@ -1,0 +1,119 @@
+<aside class="finalproject">
+  <video id="myVideo" width="460">
+    <source src="/assets/video/UG_23SP_LamYSR_1080.mov" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+
+  <div class="controls">
+    <button id="playPause">Play</button>
+    <div class="progress-container" id="progressContainer">
+      <div class="progress" id="progress"></div>
+    </div>
+    <input type="range" id="volume" min="0" max="1" step="0.01" value="1">
+    <button id="fullscreen">Fullscreen</button>
+  </div>
+</aside>
+
+<style>
+.finalproject {
+  width: 460px; /* matches your video width */
+  position: relative;
+  background: #000;
+  margin: 50px auto;
+  font-family: sans-serif;
+}
+
+.finalproject video {
+  width: 100%;
+  display: block;
+}
+
+.finalproject .controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(0,0,0,0.7);
+  padding: 6px 8px;
+  color: white;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+
+.finalproject .controls button {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 4px 6px;
+}
+
+.finalproject .controls input[type="range"] {
+  cursor: pointer;
+  width: 60px; /* fits small width */
+}
+
+.progress-container {
+  flex: 1;
+  margin: 0 6px;
+  height: 4px;
+  background: #555;
+  position: relative;
+  cursor: pointer;
+}
+
+.progress {
+  width: 0%;
+  height: 100%;
+  background: #f00;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const video = document.getElementById('myVideo');
+  const playPauseBtn = document.getElementById('playPause');
+  const progressContainer = document.getElementById('progressContainer');
+  const progress = document.getElementById('progress');
+  const volumeSlider = document.getElementById('volume');
+  const fullscreenBtn = document.getElementById('fullscreen');
+
+  // Play / Pause
+  playPauseBtn.addEventListener('click', () => {
+    if(video.paused){
+      video.play();
+      playPauseBtn.textContent = 'Pause';
+    } else {
+      video.pause();
+      playPauseBtn.textContent = 'Play';
+    }
+  });
+
+  // Update progress bar
+  video.addEventListener('timeupdate', () => {
+    const percent = (video.currentTime / video.duration) * 100;
+    progress.style.width = percent + '%';
+  });
+
+  // Seek video
+  progressContainer.addEventListener('click', (e) => {
+    const rect = progressContainer.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    video.currentTime = (clickX / rect.width) * video.duration;
+  });
+
+  // Volume control
+  volumeSlider.addEventListener('input', () => {
+    video.volume = volumeSlider.value;
+  });
+
+  // Fullscreen
+  fullscreenBtn.addEventListener('click', () => {
+    if(document.fullscreenElement){
+      document.exitFullscreen();
+    } else {
+      document.querySelector('.finalproject').requestFullscreen();
+    }
+  });
+});
+</script>

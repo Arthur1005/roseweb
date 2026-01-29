@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Project A — Arthur Lin</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+
+</head>
+<body>
+    <div class="page-wrap">
+        <nav>
+            <img  alt="logo" width="24px" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSU8u8tpVE9yl1Jj0L81O7deRDfyW-yOXX-Kw&s" onclick="window.location.href='index.html';">
+            
+            <div   class="pageNav">
+                <button onclick="location.href='project.html'">Project</button>
+                <button id="contactOpen">Contact</button>
+            </div>
+        </nav>
+
+        <main class="projectDetailMain">
+            <section class="projectNav">
+                <div class="previouswork">
+                    <img src="/assets/icon/Arrow_Previous.svg" alt="">
+                    <button onclick="location.href='projectPrevious.html'">Previous</button>
+                </div>
+
+                <div class="nextwork">
+                    <button onclick="location.href='projectNext.html'">Next</button>
+                    <img src="/assets/icon/Arrow_Next.svg" alt="">
+                </div>
+            </section>
+
+            <div class="content-area"></div>
+
+                <section class="individualProjectContent">
+                    <section class="introduction">
+                        <p id="introtitle">Friday</p>
+                        <p id="introdescription">"Friday" follows a surreal and interpretative "day in the life of an architect".
+<br>
+<br>
+Commissioned by Archi+ (an architecture firm based in Hong Kong), motion designer Jee Kim
+and I teamed up to create a 60-second animation that encompasses the highs and lows of what
+
+an architect goes through when receiving a project from a client.</p>
+                    </section>
+
+                    <section class="finalproject">
+                        <div class="video-container" style="position: relative;">
+                            <video id="myVideo" width="400" playsinline autoplay muted>
+                                <source src="/assets/video/Archi+_YSRL_with sfx.mp4" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+
+                            <div class="controls" style="position: absolute; bottom: 0; left: 0; right: 0; z-index: 10; pointer-events: auto; cursor: pointer;">
+                                <img src="/assets/icon/pause.svg" alt="Play/Pause" id="playPause" draggable="false" oncontextmenu="return false;" ondragstart="return false;" />
+                                <span id="timeDisplay">00:00 / 00:00</span>
+                                <div class="progress-container" id="progressContainer">
+                                <div class="progress" id="progress"></div>
+                                </div>
+                                <img src="/assets/icon/soundsOn.svg" alt="On/off volume" id="volume" draggable="false" oncontextmenu="return false;" ondragstart="return false;"/>
+                                <img src="/assets/icon/Enter_Fullscreen.svg" alt="Fullscreen" id="fullscreen" draggable="false" oncontextmenu="return false;" ondragstart="return false;"/>
+                            </div>
+                        </div>
+                    </section>
+                </section>
+                
+
+                <section class="individualProjectContentpdf">
+                    <section class="introduction">
+                        <p id="introtitle">Working Progress</p>
+                        <p id="introdescription">An interwefwrfwerfwefwfactive inity and percpierpgjaeigjagjrgioapeption.</p>
+                    </section>
+
+                    <section class="pdfviewer">
+                        <canvas id="pdf-canvas-current"></canvas>
+                        <canvas id="pdf-canvas-next"></canvas>
+                        <div id="pdf-thumbnails" class="thumbnails-container"></div>
+
+                        <div id="pdf-controls">
+                            <img id="download-pdf" src="/assets/icon/download.svg" alt="Download PDF">
+                            <img id="fullscreen-pdf" src="/assets/icon/Enter_Fullscreen.svg" alt="Fullscreen">
+                            <img id="prev-page" src="/assets/icon/Arrow_Previous_PW.svg" height="12px" alt="Previous Page">
+                            <img id="next-page" src="/assets/icon/Arrow_Next_PW.svg" height="12px" alt="Next Page">
+                        </div>
+                        <div id="thumb-hover-zone"></div>
+
+                    </section>
+
+            </section>
+
+        </main>
+    </div>
+
+    
+
+    <footer>
+
+        <div class="footerTop">
+            <div class="roseLamIcon">  
+                <img src="/assets/icon/RoseLam.svg" alt="RoseLamIcon" height="100px">
+            </div>
+            <div class="justSpace"></div>
+            <div class="socialsdiv">
+                    <a href="https://www.linkedin.com/in/yeosanroselam/" target="_blank"><img src="/assets/icon/linkedin (1).png" alt="LinkedIn"></a>
+                    <a href="https://www.facebook.com/rose.lam.98096" target="_blank""><img src="/assets/icon/facebook.svg" alt="Facebook"></a>
+                    <a href="https://www.instagram.com/roselam.art?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="  target="_blank"><img src="/assets/icon/insta.png" alt="Instagram"></a>
+                    </div>
+            </div>
+        </div>
+        <br>
+        <hr>
+        <div class="footerBottom">
+            <div>
+                <p>© <span class="year">2025</span> Rose Lam. All rights reserved.</p>
+                <p class="credit">Designed & built by Arthur</p> 
+                </div>  
+            <div>
+                <div class="legaldiv">
+                    
+                </div>
+                <div class="legaldivv">
+                    <br>
+                    <a href="/privacy.html">Privacy Policy</a>
+                    <a href="/terms.html">Terms & Conditions</a>
+                </div>
+            </div>    
+        </div>
+      
+    </footer>
+
+
+    <div id="overlay"></div>
+    <!-- Contact panel -->
+
+    <aside id="contacts" class="contacts">
+        <div class="contactsTitle">
+            <button id="contactClose">Close</button>
+            <h6 style="text-decoration: bold;">Contact</h6>
+        </div>
+        <div class="contactFormSpace">
+            <form id="myForm">
+            <div class="contactForm">
+                <label>Name</label>
+                <input type="text" placeholder="Your name" required>
+            </div>
+            <div class="contactForm">
+                <label>Email</label>
+                <input type="email" placeholder="Your email" required>
+            </div>
+            <div class="contactForm">
+                <label>Message</label>
+                <textarea placeholder="Say hello..." required></textarea>
+            </div>
+            <button class="contactSubmitButton">Submit</button>
+            </form>
+        </div>
+    </aside>   
+
+    <script src="/js/style.js"></script>
+</body>
+</html>
