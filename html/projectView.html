@@ -1,992 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Project — Arthur Lin</title>
   <link rel="stylesheet" href="../css/style.css">
+  <script>if(sessionStorage.getItem('nav-curtain')==='1'){document.documentElement.classList.add('nav-curtain');sessionStorage.removeItem('nav-curtain');}</script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-  <style>
-    /* Upload placeholder frames (owner only) */
-    .upload-placeholder {
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      border: 2px dashed rgba(8, 164, 189, 0.5);
-      border-radius: 8px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.4s ease;
-      position: relative;
-    }
-    .upload-placeholder:hover {
-      background: rgba(8, 164, 189, 0.08);
-      border-color: #08A4BD;
-    }
-    .upload-placeholder .plus {
-      font-size: 48px;
-      color: rgba(8, 164, 189, 0.5);
-      line-height: 1;
-      font-family: 'Geist Regular';
-      transition: color 0.4s ease;
-    }
-    .upload-placeholder:hover .plus {
-      color: #08A4BD;
-    }
-    .upload-placeholder .placeholder-label {
-      font-size: clamp(10px, 1vw, 14px);
-      color: rgba(8, 164, 189, 0.5);
-      margin-top: 8px;
-      font-family: 'Geist Mono';
-      transition: color 0.4s ease;
-    }
-    .upload-placeholder:hover .placeholder-label {
-      color: #08A4BD;
-    }
-    .upload-placeholder.uploading {
-      pointer-events: none;
-    }
-    .upload-placeholder .upload-progress {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-      width: 60%;
-    }
-    .upload-placeholder.uploading .plus,
-    .upload-placeholder.uploading .placeholder-label {
-      display: none;
-    }
-    .upload-placeholder.uploading .upload-progress {
-      display: flex;
-    }
-    .upload-percent {
-      font-size: clamp(14px, 2vw, 24px);
-      color: #08A4BD;
-      font-family: 'Geist Medium';
-    }
-    .upload-bar-track {
-      width: 100%;
-      height: 4px;
-      background: rgba(8, 164, 189, 0.15);
-      border-radius: 100px;
-      overflow: hidden;
-    }
-    .upload-bar-fill {
-      height: 100%;
-      width: 0%;
-      background: #08A4BD;
-      border-radius: 100px;
-      transition: width 0.3s ease;
-    }
-    .upload-label {
-      font-size: clamp(10px, 1vw, 12px);
-      color: rgba(8, 164, 189, 0.5);
-      font-family: 'Geist Mono';
-    }
-
-    /* Description placeholder (owner only) */
-    .desc-placeholder {
-      margin-top: 20px;
-      padding: 12px;
-      border: 1px dashed rgba(8, 164, 189, 0.4);
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.4s ease;
-      min-height: 60px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .desc-placeholder:hover {
-      border-color: #08A4BD;
-      background: rgba(8, 164, 189, 0.05);
-    }
-    .desc-placeholder .plus {
-      font-size: 20px;
-      color: rgba(8, 164, 189, 0.5);
-      font-family: 'Geist Regular';
-    }
-    .desc-placeholder .placeholder-label {
-      font-size: clamp(10px, 1vw, 14px);
-      color: rgba(8, 164, 189, 0.5);
-      font-family: 'Geist Mono';
-    }
-
-    /* Description edit mode */
-    .desc-edit-area {
-      margin-top: 20px;
-      display: none;
-    }
-    .desc-edit-area textarea {
-      width: 100%;
-      min-height: 100px;
-      font-family: 'Geist Mono';
-      font-size: clamp(12px, 1vw, 16px);
-      background: rgba(255,255,255,0.05);
-      color: #EAEAEA;
-      border: 1px solid rgba(8, 164, 189, 0.4);
-      border-radius: 6px;
-      padding: 10px;
-      resize: vertical;
-      max-width: 100%;
-      text-align: left;
-      opacity: 1;
-    }
-    .desc-edit-area textarea:focus {
-      border-color: #08A4BD;
-      outline: none;
-    }
-    .desc-edit-area .edit-actions {
-      display: flex;
-      gap: 8px;
-      margin-top: 8px;
-    }
-    .desc-edit-area .edit-actions button {
-      padding: 4px 16px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-family: 'Geist Medium';
-      font-size: clamp(10px, 1vw, 12px);
-    }
-    .btn-save {
-      background: #08A4BD;
-      color: #fff;
-      border: none;
-    }
-    .btn-cancel {
-      background: transparent;
-      color: #EAEAEA;
-      border: 1px solid rgba(234,234,234,0.3);
-    }
-
-    /* Edit icon next to description when it exists */
-    .desc-edit-trigger {
-      display: inline-block;
-      margin-top: 12px;
-      cursor: pointer;
-      font-size: clamp(10px, 1vw, 12px);
-      color: rgba(8, 164, 189, 0.6);
-      font-family: 'Geist Mono';
-      transition: color 0.3s ease;
-      border-bottom: 1px dashed rgba(8, 164, 189, 0.3);
-    }
-    .desc-edit-trigger:hover {
-      color: #08A4BD;
-      border-bottom-color: #08A4BD;
-    }
-
-    /* Delete button */
-    .delete-btn {
-      padding: 8px 24px;
-      background: transparent;
-      color: rgba(192, 57, 43, 0.6);
-      border: 1px dashed rgba(192, 57, 43, 0.4);
-      border-radius: 4px;
-      cursor: pointer;
-      font-family: 'Geist Mono';
-      font-size: clamp(10px, 1vw, 12px);
-      transition: all 0.4s ease;
-    }
-    .delete-btn:hover {
-      color: #c0392b;
-      border-color: #c0392b;
-      background: rgba(192, 57, 43, 0.08);
-    }
-  </style>
 </head>
 <body>
-  <div class="page-wrap">
-    <nav>
-      <img alt="logo" width="24px" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSU8u8tpVE9yl1Jj0L81O7deRDfyW-yOXX-Kw&s" onclick="window.location.href='index.html';">
-      <div class="pageNav">
-        <button onclick="location.href='project.html'">Project</button>
-        <button id="contactOpen">Contact</button>
-      </div>
-    </nav>
-
-    <main class="projectDetailMain">
-      <section class="projectNav">
-        <div class="previouswork">
-          <img src="/assets/icon/Arrow_Previous.svg" alt="">
-          <button onclick="location.href='project.html'">Back to Projects</button>
-        </div>
-      </section>
-
-      <div class="content-area"></div>
-
-      <!-- === MAIN PROJECT SECTION (video or image + description) === -->
-      <section class="individualProjectContent" id="main-section">
-        <section class="introduction">
-          <p id="introtitle">Loading...</p>
-          <p id="introdescription"></p>
-
-          <!-- Owner: description placeholder (shown when no description) -->
-          <div class="owner-only desc-placeholder" id="desc-placeholder" style="display:none;" onclick="showDescEditor()">
-            <span class="plus">+</span>
-            <span class="placeholder-label">Add description</span>
-          </div>
-
-          <!-- Owner: edit trigger (shown when description exists) -->
-          <span class="owner-only desc-edit-trigger" id="desc-edit-trigger" style="display:none;" onclick="showDescEditor()">Edit description</span>
-
-          <!-- Owner: description editor -->
-          <div class="desc-edit-area" id="desc-edit-area">
-            <textarea id="edit-description" placeholder="Write a description..."></textarea>
-            <div class="edit-actions">
-              <button class="btn-save" id="save-description">Save</button>
-              <button class="btn-cancel" id="cancel-description">Cancel</button>
+    <div class="page-wrap">
+        <nav>
+            <img alt="logo" width="24px" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSU8u8tpVE9yl1Jj0L81O7deRDfyW-yOXX-Kw&s" onclick="window.location.href='index.html';">
+            <button class="hamburger" id="hamburger" aria-label="Menu">
+              <span></span><span></span><span></span>
+            </button>
+            <div class="pageNav">
+                <button onclick="location.href='project.html'">Project</button>
+                <button id="contactOpen">Contact</button>
             </div>
-          </div>
-        </section>
+        </nav>
 
-        <section class="finalproject" id="finalproject-area">
-          <!-- Video player (hidden until video loaded) -->
-          <div class="video-container" id="video-container" style="position:relative; display:none;">
-            <video id="myVideo" width="400" playsinline autoplay muted>
-              <source id="video-source" src="" type="video/mp4">
-            </video>
-            <div class="controls" style="position:absolute; bottom:0; left:0; right:0; z-index:10; pointer-events:auto; cursor:pointer;">
-              <img src="/assets/icon/pause.svg" alt="Play/Pause" id="playPause" draggable="false" oncontextmenu="return false;" ondragstart="return false;" />
-              <span id="timeDisplay">00:00 / 00:00</span>
-              <div class="progress-container" id="progressContainer">
-                <div class="progress" id="progress"></div>
-              </div>
-              <img src="/assets/icon/soundsOn.svg" alt="On/off volume" id="volume" draggable="false" oncontextmenu="return false;" ondragstart="return false;"/>
-              <img src="/assets/icon/Enter_Fullscreen.svg" alt="Fullscreen" id="fullscreen" draggable="false" oncontextmenu="return false;" ondragstart="return false;"/>
-            </div>
-          </div>
+        <main class="projectDetailMain">
+            <section class="projectNav">
+                <div class="previouswork">
+                    <img src="/assets/icon/Arrow_Previous.svg" alt="">
+                    <button onclick="location.href='projectPrevious.html'">Previous</button>
+                </div>
 
-          <!-- Thumbnail image (shown when no video, for visitors) -->
-          <img id="project-image" src="" alt="" style="width:100%; aspect-ratio:16/9; object-fit:cover; display:none;">
+                <div class="nextwork">
+                    <button onclick="location.href='projectNext.html'">Next</button>
+                    <img src="/assets/icon/Arrow_Next.svg" alt="">
+                </div>
+            </section>
 
-          <!-- Owner: video upload placeholder (shown when no video) -->
-          <input type="file" id="video-file" accept="video/mp4" style="display:none;">
-          <div class="owner-only upload-placeholder" id="video-placeholder" style="display:none;" onclick="document.getElementById('video-file').click()">
-            <span class="plus">+</span>
-            <span class="placeholder-label">Upload Video (.mp4)</span>
-            <div class="upload-progress">
-              <span class="upload-percent" id="video-percent">0%</span>
-              <div class="upload-bar-track"><div class="upload-bar-fill" id="video-bar"></div></div>
-              <span class="upload-label">Uploading video...</span>
-            </div>
-          </div>
-        </section>
-      </section>
+            <div class="content-area"></div>
 
-      <!-- === PDF SECTION (matches friday.html layout) === -->
-      <section class="individualProjectContentpdf" id="pdf-section" style="display:none;">
-        <section class="introduction">
-          <p id="pdf-section-title">Working Progress</p>
-          <p id="pdf-description"></p>
+            <section class="individualProjectContent">
+                <section class="introduction">
+                    <p id="introtitle">Project Title</p>
+                    <p id="introdescription">Project description goes here.</p>
+                </section>
 
-          <!-- Owner: PDF description placeholder -->
-          <div class="owner-only desc-placeholder" id="pdf-desc-placeholder" style="display:none;" onclick="showPdfDescEditor()">
-            <span class="plus">+</span>
-            <span class="placeholder-label">Add description</span>
-          </div>
+                <section class="finalproject">
+                    <div class="video-container" style="position: relative;">
+                        <video id="myVideo" width="400" playsinline autoplay muted>
+                            <source src="" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
 
-          <!-- Owner: PDF description edit trigger -->
-          <span class="owner-only desc-edit-trigger" id="pdf-desc-edit-trigger" style="display:none;" onclick="showPdfDescEditor()">Edit description</span>
+                        <div class="controls" style="position: absolute; bottom: 0; left: 0; right: 0; z-index: 10; pointer-events: auto; cursor: pointer;">
+                            <img src="/assets/icon/pause.svg" alt="Play/Pause" id="playPause" draggable="false" oncontextmenu="return false;" ondragstart="return false;" />
+                            <span id="timeDisplay">00:00 / 00:00</span>
+                            <div class="progress-container" id="progressContainer">
+                                <div class="progress" id="progress"></div>
+                            </div>
+                            <img src="/assets/icon/soundsOn.svg" alt="On/off volume" id="volume" draggable="false" oncontextmenu="return false;" ondragstart="return false;"/>
+                            <img src="/assets/icon/Enter_Fullscreen.svg" alt="Fullscreen" id="fullscreen" draggable="false" oncontextmenu="return false;" ondragstart="return false;"/>
+                        </div>
+                    </div>
+                </section>
+            </section>
 
-          <!-- Owner: PDF description editor -->
-          <div class="desc-edit-area" id="pdf-desc-edit-area">
-            <textarea id="edit-pdf-description" placeholder="Write a description..."></textarea>
-            <div class="edit-actions">
-              <button class="btn-save" id="save-pdf-description">Save</button>
-              <button class="btn-cancel" id="cancel-pdf-description">Cancel</button>
-            </div>
-          </div>
-        </section>
+            <section class="individualProjectContentpdf">
+                <section class="introduction">
+                    <p id="introtitle">Working Progress</p>
+                    <p id="introdescription">Description goes here.</p>
+                </section>
 
-        <section class="pdfviewer" id="pdfviewer-area">
-          <!-- PDF canvases (hidden until PDF loaded) -->
-          <canvas id="pdf-canvas-current" style="display:none;"></canvas>
-          <canvas id="pdf-canvas-next" style="display:none;"></canvas>
-          <div id="pdf-thumbnails" class="thumbnails-container"></div>
-          <div id="pdf-controls" style="display:none;">
-            <img id="download-pdf" src="/assets/icon/download.svg" alt="Download PDF">
-            <img id="fullscreen-pdf" src="/assets/icon/Enter_Fullscreen.svg" alt="Fullscreen">
-            <img id="prev-page" src="/assets/icon/Arrow_Previous_PW.svg" height="12px" alt="Previous Page">
-            <img id="next-page" src="/assets/icon/Arrow_Next_PW.svg" height="12px" alt="Next Page">
-          </div>
-          <div id="thumb-hover-zone"></div>
+                <section class="pdfviewer">
+                    <canvas id="pdf-canvas-current"></canvas>
+                    <canvas id="pdf-canvas-next"></canvas>
+                    <div id="pdf-thumbnails" class="thumbnails-container"></div>
 
-          <!-- Owner: PDF upload placeholder (sits inside .pdfviewer for correct flex layout) -->
-          <input type="file" id="pdf-file" accept="application/pdf" style="display:none;">
-          <div class="upload-placeholder" id="pdf-placeholder" style="display:none; position:absolute; inset:0; z-index:5; border-radius:0;" onclick="document.getElementById('pdf-file').click()">
-            <span class="plus">+</span>
-            <span class="placeholder-label">Upload PDF</span>
-            <div class="upload-progress">
-              <span class="upload-percent" id="pdf-percent">0%</span>
-              <div class="upload-bar-track"><div class="upload-bar-fill" id="pdf-bar"></div></div>
-              <span class="upload-label">Uploading PDF...</span>
-            </div>
-          </div>
-        </section>
-      </section>
+                    <div id="pdf-controls">
+                        <img id="download-pdf" src="/assets/icon/download.svg" alt="Download PDF">
+                        <img id="fullscreen-pdf" src="/assets/icon/Enter_Fullscreen.svg" alt="Fullscreen">
+                        <img id="prev-page" src="/assets/icon/Arrow_Previous_PW.svg" height="12px" alt="Previous Page">
+                        <img id="next-page" src="/assets/icon/Arrow_Next_PW.svg" height="12px" alt="Next Page">
+                    </div>
+                    <div id="thumb-hover-zone"></div>
+                </section>
+            </section>
 
-      <!-- Owner: Delete project -->
-      <div class="owner-only" id="delete-area" style="display:none; margin-top:40px; margin-bottom:40px;">
-        <button class="delete-btn" id="delete-project-btn">Delete Project</button>
-      </div>
-
-    </main>
-  </div>
-
-  <footer>
-    <div class="footerTop">
-      <div class="roseLamIcon">
-        <img src="/assets/icon/RoseLam.svg" alt="RoseLamIcon" height="100px">
-      </div>
-      <div class="justSpace"></div>
-      <div class="socialsdiv">
-        <a href="https://www.linkedin.com/in/yeosanroselam/" target="_blank"><img src="/assets/icon/linkedin (1).png" alt="LinkedIn"></a>
-        <a href="https://www.facebook.com/rose.lam.98096" target="_blank"><img src="/assets/icon/facebook.svg" alt="Facebook"></a>
-        <a href="https://www.instagram.com/roselam.art?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank"><img src="/assets/icon/insta.png" alt="Instagram"></a>
-      </div>
+        </main>
     </div>
-    <br>
-    <hr>
-    <div class="footerBottom">
-      <div>
-        <p>&copy; <span class="year">2025</span> Rose Lam. All rights reserved.</p>
-        <p class="credit">Designed & built by Arthur</p>
-      </div>
-      <div>
-        <div class="legaldiv"></div>
-        <div class="legaldivv">
-          <br>
-          <a href="/privacy.html">Privacy Policy</a>
-          <a href="/terms.html">Terms & Conditions</a>
+
+    <footer>
+        <div class="footerTop">
+            <div class="roseLamIcon">
+                <img src="/assets/icon/RoseLam.svg" alt="RoseLamIcon" height="100px">
+            </div>
+            <div class="justSpace"></div>
+            <div class="socialsdiv">
+                <a href="https://www.linkedin.com/in/yeosanroselam/" target="_blank"><img src="/assets/icon/linkedin (1).png" alt="LinkedIn"></a>
+                <a href="https://www.facebook.com/rose.lam.98096" target="_blank"><img src="/assets/icon/facebook.svg" alt="Facebook"></a>
+                <a href="https://www.instagram.com/roselam.art?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank"><img src="/assets/icon/insta.png" alt="Instagram"></a>
+            </div>
         </div>
-      </div>
-    </div>
-  </footer>
-
-  <div id="overlay"></div>
-
-  <aside id="contacts" class="contacts">
-    <div class="contactsTitle">
-      <button id="contactClose">Close</button>
-      <h6 style="text-decoration: bold;">Contact</h6>
-    </div>
-    <div class="contactFormSpace">
-      <form id="myForm">
-        <div class="contactForm">
-          <label>Name</label>
-          <input type="text" placeholder="Your name" required>
+        <br>
+        <hr>
+        <div class="footerBottom">
+            <div>
+                <p>© <span class="year">2025</span> Rose Lam. All rights reserved.</p>
+                <p class="credit">Designed & built by Arthur</p>
+            </div>
+            <div>
+                <div class="legaldiv"></div>
+                <div class="legaldivv">
+                    <br>
+                    <a href="/privacy.html">Privacy Policy</a>
+                    <a href="/terms.html">Terms & Conditions</a>
+                </div>
+            </div>
         </div>
-        <div class="contactForm">
-          <label>Email</label>
-          <input type="email" placeholder="Your email" required>
+    </footer>
+
+    <div id="overlay"></div>
+
+    <aside id="contacts" class="contacts">
+        <div class="contactsTitle">
+            <button id="contactClose"><span class="close-label">Close</span><span class="close-x-icon"><span></span><span></span></span></button>
+            <h6 style="text-decoration: bold;">Contact</h6>
         </div>
-        <div class="contactForm">
-          <label>Message</label>
-          <textarea placeholder="Say hello..." required></textarea>
+        <div class="contactFormSpace">
+            <form id="myForm">
+                <div class="contactForm">
+                    <label>Name</label>
+                    <input type="text" placeholder="Your name" required>
+                </div>
+                <div class="contactForm">
+                    <label>Email</label>
+                    <input type="email" placeholder="Your email" required>
+                </div>
+                <div class="contactForm">
+                    <label>Message</label>
+                    <textarea placeholder="Say hello..." required></textarea>
+                </div>
+                <button class="contactSubmitButton">Submit</button>
+            </form>
         </div>
-        <button class="contactSubmitButton">Submit</button>
-      </form>
-    </div>
-  </aside>
+    </aside>
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
-
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyDqex8fvOHREyavy0BsTUqge-Lccu66dM8",
-      authDomain: "roselam-47ab1.firebaseapp.com",
-      projectId: "roselam-47ab1",
-      storageBucket: "roselam-47ab1.firebasestorage.app",
-      messagingSenderId: "1072333228569",
-      appId: "1:1072333228569:web:995d54b896f21e1ad23888",
-      measurementId: "G-7PGL8W8BWF"
-    };
-
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    const storage = firebase.storage();
-
-    const params = new URLSearchParams(window.location.search);
-    const projectId = params.get('id');
-    let projectData = null;
-    let isOwner = false;
-
-    // --- Auth state ---
-    auth.onAuthStateChanged(function(user) {
-      isOwner = !!user;
-      var els = document.querySelectorAll('.owner-only');
-      els.forEach(function(el) { el.style.display = user ? 'block' : 'none'; });
-      // Re-render if project already loaded (so placeholders show/hide)
-      if (projectData) renderProject(projectData);
-    });
-
-    // --- Load project ---
-    if (projectId) {
-      db.collection("projects").doc(projectId).get().then(function(doc) {
-        if (doc.exists) {
-          projectData = doc.data();
-          document.title = projectData.title + ' — Arthur Lin';
-          renderProject(projectData);
-        } else {
-          document.getElementById('introtitle').textContent = 'Project not found';
-        }
-      }).catch(function(error) {
-        document.getElementById('introtitle').textContent = 'Error loading project';
-        console.error(error);
-      });
-    } else {
-      document.getElementById('introtitle').textContent = 'No project specified';
-    }
-
-    // =====================
-    //  RENDER PROJECT
-    // =====================
-    function renderProject(p) {
-      // --- Title ---
-      document.getElementById('introtitle').textContent = p.title;
-
-      // --- Description ---
-      var descEl = document.getElementById('introdescription');
-      var descPlaceholder = document.getElementById('desc-placeholder');
-      var descEditTrigger = document.getElementById('desc-edit-trigger');
-      var descEditArea = document.getElementById('desc-edit-area');
-
-      if (p.description) {
-        descEl.textContent = p.description;
-        descEl.style.display = '';
-        if (descPlaceholder) descPlaceholder.style.display = 'none';
-        if (descEditTrigger && isOwner) descEditTrigger.style.display = 'inline-block';
-      } else {
-        descEl.style.display = 'none';
-        if (descPlaceholder && isOwner) descPlaceholder.style.display = 'flex';
-        if (descEditTrigger) descEditTrigger.style.display = 'none';
-      }
-      // Always hide editor on render
-      if (descEditArea) descEditArea.style.display = 'none';
-      document.getElementById('edit-description').value = p.description || '';
-
-      // --- Video / Image ---
-      var videoContainer = document.getElementById('video-container');
-      var projectImage = document.getElementById('project-image');
-      var videoPlaceholder = document.getElementById('video-placeholder');
-
-      if (p.video) {
-        // Show video player
-        videoContainer.style.display = '';
-        projectImage.style.display = 'none';
-        if (videoPlaceholder) videoPlaceholder.style.display = 'none';
-
-        document.getElementById('video-source').src = p.video;
-        document.getElementById('myVideo').load();
-        initVideoPlayer();
-      } else {
-        // No video
-        videoContainer.style.display = 'none';
-
-        if (isOwner) {
-          // Owner sees placeholder frame
-          projectImage.style.display = 'none';
-          if (videoPlaceholder) videoPlaceholder.style.display = 'flex';
-        } else {
-          // Visitor sees thumbnail
-          projectImage.src = p.image || '';
-          projectImage.alt = p.title;
-          projectImage.style.display = '';
-          if (videoPlaceholder) videoPlaceholder.style.display = 'none';
-        }
-      }
-
-      // --- PDF section ---
-      var pdfSection = document.getElementById('pdf-section');
-      var pdfViewerArea = document.getElementById('pdfviewer-area');
-      var pdfPlaceholder = document.getElementById('pdf-placeholder');
-      var pdfCanvases = pdfViewerArea.querySelectorAll('canvas');
-      var pdfControls = document.getElementById('pdf-controls');
-
-      if (p.pdf) {
-        pdfSection.style.display = 'flex';
-        pdfViewerArea.style.background = '#000';
-        pdfCanvases.forEach(function(c) { c.style.display = ''; });
-        pdfControls.style.display = '';
-        if (pdfPlaceholder) pdfPlaceholder.style.display = 'none';
-        initPdfViewer(p.pdf);
-      } else if (isOwner) {
-        // Owner sees PDF section with placeholder inside .pdfviewer
-        pdfSection.style.display = 'flex';
-        pdfViewerArea.style.background = 'transparent';
-        pdfCanvases.forEach(function(c) { c.style.display = 'none'; });
-        pdfControls.style.display = 'none';
-        if (pdfPlaceholder) pdfPlaceholder.style.display = 'flex';
-      } else {
-        // Visitor: hide PDF section entirely
-        pdfSection.style.display = 'none';
-      }
-
-      // --- PDF description ---
-      var pdfDescEl = document.getElementById('pdf-description');
-      var pdfDescPlaceholder = document.getElementById('pdf-desc-placeholder');
-      var pdfDescEditTrigger = document.getElementById('pdf-desc-edit-trigger');
-      var pdfDescEditArea = document.getElementById('pdf-desc-edit-area');
-
-      if (p.pdfDescription) {
-        pdfDescEl.textContent = p.pdfDescription;
-        pdfDescEl.style.display = '';
-        if (pdfDescPlaceholder) pdfDescPlaceholder.style.display = 'none';
-        if (pdfDescEditTrigger && isOwner) pdfDescEditTrigger.style.display = 'inline-block';
-      } else {
-        pdfDescEl.style.display = 'none';
-        if (pdfDescPlaceholder && isOwner) pdfDescPlaceholder.style.display = 'flex';
-        if (pdfDescEditTrigger) pdfDescEditTrigger.style.display = 'none';
-      }
-      if (pdfDescEditArea) pdfDescEditArea.style.display = 'none';
-      document.getElementById('edit-pdf-description').value = p.pdfDescription || '';
-    }
-
-    // =====================
-    //  DESCRIPTION EDIT
-    // =====================
-    function showDescEditor() {
-      document.getElementById('desc-placeholder').style.display = 'none';
-      document.getElementById('desc-edit-trigger').style.display = 'none';
-      document.getElementById('desc-edit-area').style.display = 'block';
-      document.getElementById('edit-description').focus();
-    }
-
-    document.getElementById('save-description').addEventListener('click', function() {
-      var val = document.getElementById('edit-description').value;
-      if (!projectId) return;
-      db.collection("projects").doc(projectId).update({ description: val }).then(function() {
-        projectData.description = val;
-        renderProject(projectData);
-      }).catch(function(err) { alert('Error: ' + err.message); });
-    });
-
-    document.getElementById('cancel-description').addEventListener('click', function() {
-      document.getElementById('edit-description').value = projectData.description || '';
-      document.getElementById('desc-edit-area').style.display = 'none';
-      // Restore the right element
-      if (projectData.description) {
-        document.getElementById('introdescription').style.display = '';
-        document.getElementById('desc-edit-trigger').style.display = 'inline-block';
-      } else {
-        document.getElementById('desc-placeholder').style.display = 'flex';
-      }
-    });
-
-    // =====================
-    //  PDF DESCRIPTION EDIT
-    // =====================
-    function showPdfDescEditor() {
-      document.getElementById('pdf-desc-placeholder').style.display = 'none';
-      document.getElementById('pdf-desc-edit-trigger').style.display = 'none';
-      document.getElementById('pdf-desc-edit-area').style.display = 'block';
-      document.getElementById('edit-pdf-description').focus();
-    }
-
-    document.getElementById('save-pdf-description').addEventListener('click', function() {
-      var val = document.getElementById('edit-pdf-description').value;
-      if (!projectId) return;
-      db.collection("projects").doc(projectId).update({ pdfDescription: val }).then(function() {
-        projectData.pdfDescription = val;
-        renderProject(projectData);
-      }).catch(function(err) { alert('Error: ' + err.message); });
-    });
-
-    document.getElementById('cancel-pdf-description').addEventListener('click', function() {
-      document.getElementById('edit-pdf-description').value = projectData.pdfDescription || '';
-      document.getElementById('pdf-desc-edit-area').style.display = 'none';
-      if (projectData.pdfDescription) {
-        document.getElementById('pdf-description').style.display = '';
-        document.getElementById('pdf-desc-edit-trigger').style.display = 'inline-block';
-      } else {
-        document.getElementById('pdf-desc-placeholder').style.display = 'flex';
-      }
-    });
-
-    // =====================
-    //  VIDEO UPLOAD (with progress)
-    // =====================
-    document.getElementById('video-file').addEventListener('change', async function() {
-      var file = this.files[0];
-      if (!file || !projectId) return;
-
-      var placeholder = document.getElementById('video-placeholder');
-      var percentEl = document.getElementById('video-percent');
-      var barEl = document.getElementById('video-bar');
-      placeholder.classList.add('uploading');
-      percentEl.textContent = '0%';
-      barEl.style.width = '0%';
-
-      try {
-        var storageRef = storage.ref('project-videos/' + Date.now() + '_' + file.name);
-        var uploadTask = storageRef.put(file, { contentType: file.type });
-
-        // Track progress
-        uploadTask.on('state_changed', function(snapshot) {
-          var pct = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-          percentEl.textContent = pct + '%';
-          barEl.style.width = pct + '%';
-        });
-
-        // Wait for completion (same pattern as project.html image upload)
-        await uploadTask;
-        var videoUrl = await uploadTask.snapshot.ref.getDownloadURL();
-        await db.collection("projects").doc(projectId).update({ video: videoUrl });
-
-        projectData.video = videoUrl;
-        placeholder.classList.remove('uploading');
-        renderProject(projectData);
-      } catch (error) {
-        console.error('Video upload error:', error);
-        alert('Upload error: ' + error.message);
-        placeholder.classList.remove('uploading');
-      }
-    });
-
-    // =====================
-    //  PDF UPLOAD (with progress)
-    // =====================
-    document.getElementById('pdf-file').addEventListener('change', async function() {
-      var file = this.files[0];
-      if (!file || !projectId) return;
-
-      var placeholder = document.getElementById('pdf-placeholder');
-      var percentEl = document.getElementById('pdf-percent');
-      var barEl = document.getElementById('pdf-bar');
-      placeholder.classList.add('uploading');
-      percentEl.textContent = '0%';
-      barEl.style.width = '0%';
-
-      try {
-        var storageRef = storage.ref('project-pdfs/' + Date.now() + '_' + file.name);
-        var uploadTask = storageRef.put(file, { contentType: 'application/pdf' });
-
-        // Track progress
-        uploadTask.on('state_changed', function(snapshot) {
-          var pct = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-          percentEl.textContent = pct + '%';
-          barEl.style.width = pct + '%';
-        });
-
-        // Wait for completion
-        await uploadTask;
-        var pdfUrl = await uploadTask.snapshot.ref.getDownloadURL();
-        await db.collection("projects").doc(projectId).update({ pdf: pdfUrl });
-
-        projectData.pdf = pdfUrl;
-        placeholder.classList.remove('uploading');
-        renderProject(projectData);
-      } catch (error) {
-        console.error('PDF upload error:', error);
-        alert('Upload error: ' + error.message);
-        placeholder.classList.remove('uploading');
-      }
-    });
-
-    // =====================
-    //  DELETE PROJECT
-    // =====================
-    document.getElementById('delete-project-btn').addEventListener('click', async function() {
-      if (!confirm('Are you sure you want to delete this project?')) return;
-      try {
-        await db.collection("projects").doc(projectId).delete();
-        window.location.href = 'project.html';
-      } catch (error) {
-        alert('Error: ' + error.message);
-      }
-    });
-
-    // =====================
-    //  VIDEO PLAYER
-    // =====================
-    var videoPlayerInitialized = false;
-    function initVideoPlayer() {
-      if (videoPlayerInitialized) return;
-      videoPlayerInitialized = true;
-
-      var video = document.getElementById('myVideo');
-      if (!video) return;
-
-      var playPauseBtn = document.getElementById('playPause');
-      var progressContainer = document.getElementById('progressContainer');
-      var progress = document.getElementById('progress');
-      var volumeBtn = document.getElementById('volume');
-      var timeDisplay = document.getElementById('timeDisplay');
-      var videoContainer = document.getElementById('video-container');
-      var fullscreenBtn = document.getElementById('fullscreen');
-
-      var playIcon = "/assets/icon/play.svg";
-      var pauseIcon = "/assets/icon/pause.svg";
-      var soundsOn = "/assets/icon/soundsOn.svg";
-      var soundsOff = "/assets/icon/soundsOff.svg";
-      var enterFSIcon = "/assets/icon/Enter_Fullscreen.svg";
-      var exitFSIcon = "/assets/icon/Exit_Fullscreen.svg";
-
-      function togglePlay() {
-        if (video.paused) { video.play(); playPauseBtn.src = pauseIcon; }
-        else { video.pause(); playPauseBtn.src = playIcon; }
-      }
-
-      playPauseBtn.addEventListener('click', togglePlay);
-      video.addEventListener('click', togglePlay);
-
-      volumeBtn.addEventListener('click', function() {
-        video.muted = !video.muted;
-        volumeBtn.src = video.muted ? soundsOn : soundsOff;
-      });
-
-      function formatTime(s) {
-        var m = Math.floor(s / 60);
-        var sec = Math.floor(s % 60);
-        return m + ':' + (sec < 10 ? '0' + sec : sec);
-      }
-
-      video.addEventListener('timeupdate', function() {
-        var pct = (video.currentTime / video.duration) * 100;
-        progress.style.width = pct + '%';
-        if (!isNaN(video.duration)) {
-          timeDisplay.textContent = formatTime(video.currentTime) + ' / ' + formatTime(video.duration);
-        }
-      });
-
-      progressContainer.addEventListener('click', function(e) {
-        var rect = progressContainer.getBoundingClientRect();
-        video.currentTime = ((e.clientX - rect.left) / rect.width) * video.duration;
-      });
-
-      fullscreenBtn.addEventListener('click', function() {
-        if (document.fullscreenElement) {
-          document.exitFullscreen(); fullscreenBtn.src = enterFSIcon;
-        } else {
-          videoContainer.requestFullscreen(); fullscreenBtn.src = exitFSIcon;
-        }
-      });
-
-      document.addEventListener('keydown', function(e) {
-        if (e.code === 'Space') { e.preventDefault(); togglePlay(); }
-      });
-
-      var controls = videoContainer.querySelector('.controls');
-      var hideTimeout;
-
-      videoContainer.addEventListener('mouseenter', function() {
-        if (!document.fullscreenElement) { controls.style.opacity = '1'; controls.style.pointerEvents = 'auto'; }
-      });
-      videoContainer.addEventListener('mouseleave', function() {
-        if (!document.fullscreenElement) { controls.style.opacity = '0'; controls.style.pointerEvents = 'none'; }
-      });
-      document.addEventListener('mousemove', function() {
-        if (document.fullscreenElement) {
-          controls.style.opacity = '1'; controls.style.pointerEvents = 'auto';
-          clearTimeout(hideTimeout);
-          hideTimeout = setTimeout(function() {
-            controls.style.opacity = '0'; controls.style.pointerEvents = 'none';
-          }, 2500);
-        }
-      });
-      document.addEventListener('fullscreenchange', function() {
-        if (!document.fullscreenElement) {
-          fullscreenBtn.src = enterFSIcon;
-          clearTimeout(hideTimeout);
-          controls.style.opacity = '1'; controls.style.pointerEvents = 'auto';
-        }
-      });
-    }
-
-    // =====================
-    //  PDF VIEWER
-    // =====================
-    var pdfViewerInitialized = false;
-    function initPdfViewer(pdfUrl) {
-      if (pdfViewerInitialized) return;
-      pdfViewerInitialized = true;
-
-      var canvasCurrent = document.getElementById("pdf-canvas-current");
-      if (!canvasCurrent) return;
-
-      var pdfDoc = null, currentPage = 1, isTransitioning = false;
-      var canvasNext = document.getElementById("pdf-canvas-next");
-      var ctxCurrent = canvasCurrent.getContext("2d");
-      var ctxNext = canvasNext.getContext("2d");
-      var prevBtn = document.getElementById("prev-page");
-      var nextBtn = document.getElementById("next-page");
-      var fsBtnPdf = document.getElementById("fullscreen-pdf");
-      var dlBtn = document.getElementById("download-pdf");
-
-      pdfjsLib.getDocument(pdfUrl).promise.then(function(pdf) {
-        pdfDoc = pdf;
-        renderPage(currentPage, ctxCurrent, canvasCurrent);
-        updateBtns();
-        if (!thumbsInit) initThumbs();
-        updateThumbs(currentPage);
-      });
-
-      function renderPage(num, ctx, canvas) {
-        pdfDoc.getPage(num).then(function(page) {
-          var cont = document.querySelector(".pdfviewer");
-          var dw = cont.clientWidth, dh = dw * 9 / 16;
-          var uv = page.getViewport({ scale: 1 });
-          var sc = Math.min(dw / uv.width, dh / uv.height);
-          var ds = sc * (window.devicePixelRatio || 1);
-          var vp = page.getViewport({ scale: ds });
-          canvas.width = vp.width; canvas.height = vp.height;
-          canvas.style.width = "100%"; canvas.style.height = "100%";
-          canvas.style.opacity = 0; canvas.style.transition = "opacity 0.4s ease";
-          page.render({ canvasContext: ctx, viewport: vp }).promise.then(function() { canvas.style.opacity = 1; });
-        });
-      }
-
-      function updateBtns() {
-        prevBtn.classList.toggle("disabled", currentPage === 1);
-        nextBtn.classList.toggle("disabled", currentPage === pdfDoc.numPages);
-      }
-
-      function goToPage(n) {
-        if (isTransitioning || n < 1 || n > pdfDoc.numPages) return;
-        isTransitioning = true;
-        renderPage(n, ctxNext, canvasNext);
-        setTimeout(function() {
-          ctxCurrent.drawImage(canvasNext, 0, 0);
-          canvasNext.style.opacity = 0;
-          currentPage = n;
-          updateBtns(); updateThumbs(currentPage); updateActiveThumb(currentPage);
-          isTransitioning = false;
-        }, 500);
-      }
-
-      nextBtn.addEventListener("click", function() { goToPage(currentPage + 1); });
-      prevBtn.addEventListener("click", function() { goToPage(currentPage - 1); });
-
-      document.addEventListener("keydown", function(e) {
-        if (!document.fullscreenElement) return;
-        if (e.key === "ArrowRight") goToPage(currentPage + 1);
-        if (e.key === "ArrowLeft") goToPage(currentPage - 1);
-      });
-
-      document.addEventListener("fullscreenchange", function() {
-        if (pdfDoc) renderPage(currentPage, ctxCurrent, canvasCurrent);
-      });
-
-      dlBtn.addEventListener("click", function() {
-        var a = document.createElement("a"); a.href = pdfUrl; a.download = "document.pdf"; a.target = "_blank"; a.click();
-      });
-
-      fsBtnPdf.addEventListener("click", function() {
-        var v = document.querySelector(".pdfviewer");
-        if (!document.fullscreenElement) v.requestFullscreen(); else document.exitFullscreen();
-      });
-
-      // Thumbnails
-      var MAX_T = 7, thumbsCont = document.getElementById("pdf-thumbnails"), thumbsInit = false, thumbSlots = [];
-
-      function initThumbs() {
-        if (!thumbsCont) return;
-        thumbsCont.innerHTML = ""; thumbSlots = [];
-        for (var i = 0; i < MAX_T; i++) {
-          var img = document.createElement("img"); img.className = "pdf-thumb"; img.style.visibility = "hidden";
-          thumbsCont.appendChild(img); thumbSlots.push(img);
-        }
-        thumbsInit = true;
-      }
-
-      function getVisPgs(cp) {
-        var h = Math.floor(MAX_T / 2), s = cp - h, e = cp + h;
-        if (s < 1) { e += 1 - s; s = 1; }
-        if (e > pdfDoc.numPages) { s -= (e - pdfDoc.numPages); e = pdfDoc.numPages; }
-        if (s < 1) s = 1;
-        var pgs = []; for (var p = s; p <= e; p++) pgs.push(p); return pgs;
-      }
-
-      function updateThumbs(cp) {
-        if (!pdfDoc || !thumbsInit) return;
-        var pgs = getVisPgs(cp);
-        for (var sl = 0; sl < MAX_T; sl++) {
-          var img = thumbSlots[sl], pn = pgs[sl];
-          if (!pn) { img.style.visibility = "hidden"; img.onclick = null; img.classList.remove("active"); continue; }
-          img.style.visibility = "visible"; img.dataset.pageNumber = pn;
-          img.classList.toggle("active", pn === currentPage);
-          img.onclick = (function(p) { return function() {
-            if (p === currentPage) return;
-            currentPage = p; updateActiveThumb(currentPage); updateThumbs(currentPage); goToPage(p);
-          }; })(pn);
-          pdfDoc.getPage(pn).then((function(pn2, img2) { return function(page) {
-            var vp = page.getViewport({ scale: 0.18 });
-            var c = document.createElement("canvas"), cx = c.getContext("2d");
-            c.width = vp.width; c.height = vp.height;
-            page.render({ canvasContext: cx, viewport: vp }).promise.then(function() {
-              img2.src = c.toDataURL(); img2.classList.toggle("active", pn2 === currentPage);
-            });
-          }; })(pn, img));
-        }
-      }
-
-      function updateActiveThumb(pn) {
-        thumbSlots.forEach(function(img) { img.classList.toggle("active", Number(img.dataset.pageNumber) === pn); });
-      }
-
-      // Thumbnail hover (fullscreen only)
-      var pdfTh = document.getElementById("pdf-thumbnails");
-      var hZone = document.getElementById("thumb-hover-zone");
-      var hTimeout;
-
-      document.addEventListener("fullscreenchange", function() {
-        if (document.fullscreenElement) { showThTemp(); }
-        else { pdfTh.classList.remove("show"); pdfTh.style.pointerEvents = "none"; hZone.style.pointerEvents = "none"; }
-      });
-
-      function showThTemp() {
-        clearTimeout(hTimeout); pdfTh.classList.add("show");
-        pdfTh.style.pointerEvents = "auto"; hZone.style.pointerEvents = "auto";
-        hTimeout = setTimeout(function() { if (!pdfTh.matches(":hover")) pdfTh.classList.remove("show"); }, 2000);
-      }
-
-      hZone.addEventListener("mouseenter", function() {
-        if (!document.fullscreenElement) return; clearTimeout(hTimeout); pdfTh.classList.add("show");
-      });
-      hZone.addEventListener("mouseleave", function() {
-        if (!document.fullscreenElement) return;
-        clearTimeout(hTimeout); hTimeout = setTimeout(function() { if (!pdfTh.matches(":hover")) pdfTh.classList.remove("show"); }, 1000);
-      });
-      pdfTh.addEventListener("mouseenter", function() {
-        if (!document.fullscreenElement) return; clearTimeout(hTimeout); pdfTh.classList.add("show");
-      });
-      pdfTh.addEventListener("mouseleave", function() {
-        if (!document.fullscreenElement) return;
-        clearTimeout(hTimeout); hTimeout = setTimeout(function() { pdfTh.classList.remove("show"); }, 1000);
-      });
-    }
-
-    // =====================
-    //  CONTACT PANEL
-    // =====================
-    var contactOpen = document.getElementById('contactOpen');
-    var contactClose = document.getElementById('contactClose');
-    var contacts = document.getElementById('contacts');
-    var overlay = document.getElementById('overlay');
-
-    if (contactOpen) contactOpen.addEventListener('click', function() {
-      contacts.classList.add('active');
-      if (overlay) overlay.classList.add('active');
-      document.body.style.overflow = 'hidden';
-    });
-    if (contactClose) contactClose.addEventListener('click', function() {
-      contacts.classList.remove('active');
-      if (overlay) overlay.classList.remove('active');
-      document.body.style.overflow = '';
-    });
-    if (overlay) overlay.addEventListener('click', function() {
-      contacts.classList.remove('active');
-      overlay.classList.remove('active');
-      document.body.style.overflow = '';
-    });
-  </script>
+    <script src="../js/style.js"></script>
 </body>
 </html>

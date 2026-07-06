@@ -11,7 +11,9 @@
     <div class="page-wrap">
         <nav>
             <img  alt="logo" width="24px" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSU8u8tpVE9yl1Jj0L81O7deRDfyW-yOXX-Kw&s" onclick="window.location.href='index.html';">
-            
+            <button class="hamburger" id="hamburger" aria-label="Menu">
+              <span></span><span></span><span></span>
+            </button>
             <div   class="pageNav">
                 <button onclick="location.href='project.html'">Project</button>
                 <button id="contactOpen">Contact</button>
@@ -135,7 +137,7 @@ an architect goes through when receiving a project from a client.</p>
 
     <aside id="contacts" class="contacts">
         <div class="contactsTitle">
-            <button id="contactClose">Close</button>
+            <button id="contactClose"><span class="close-label">Close</span><span class="close-x-icon"><span></span><span></span></span></button>
             <h6 style="text-decoration: bold;">Contact</h6>
         </div>
         <div class="contactFormSpace">
@@ -157,6 +159,6 @@ an architect goes through when receiving a project from a client.</p>
         </div>
     </aside>   
 
-    <script src="/js/style.js"></script>
+    <script src="../js/style.js"></script>
 </body>
 </html>

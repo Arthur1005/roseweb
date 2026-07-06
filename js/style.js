@@ -1,6 +1,7 @@
-import { db, auth } from './src/firebase.js';
-import { signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { collection, getDocs, addDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+// Hamburger menu — handler set up below after contact panel is initialized
+const hamburger = document.getElementById('hamburger');
+const pageNav = document.querySelector('.pageNav');
+
 
 const contactOpen = document.getElementById('contactOpen');
 const contactClose = document.getElementById('contactClose');
@@ -243,7 +244,6 @@ const prevPageBtn = document.getElementById("prev-page");
 const nextPageBtn = document.getElementById("next-page");
 const fullscreenBtnpdf = document.getElementById("fullscreen-pdf");
 const downloadBtn = document.getElementById("download-pdf");
-const pdfViewer = document.querySelector(".pdfviewer");
 
 // ✅ Load PDF
 pdfjsLib.getDocument(url).promise.then(pdf => {
@@ -259,8 +259,6 @@ pdfjsLib.getDocument(url).promise.then(pdf => {
 function renderPage(num, ctx, canvas) {
   pdfDoc.getPage(num).then(page => {
     const pdfContainer = document.querySelector(".pdfviewer");
-    const inFullscreen = !!document.fullscreenElement;
-
     // ✅ Use dynamic sizing
     const displayWidth = pdfContainer.clientWidth;
 
@@ -386,7 +384,6 @@ fullscreenBtnpdf.addEventListener("click", () => {
 // ---------- Thumbnails (fixed 7 slots, instant highlight, center clicked) ----------
 
 const MAX_THUMBS = 7;
-const CENTER_INDEX = Math.floor(MAX_THUMBS / 2); // 3 => slot index 3 (4th slot)
 let thumbsContainer = document.getElementById("pdf-thumbnails");
 let thumbsInitialized = false;
 let thumbSlots = []; // array of <img> elements used as fixed slots
@@ -583,160 +580,251 @@ if (overlay) {
   const closeBtn = document.getElementById('contactClose');
   const openBtn = document.getElementById('contactOpen');
 
+  function setNavTitle(text) {
+    let navTitle = document.querySelector('.nav-page-title');
+    if (!navTitle && text) {
+      navTitle = document.createElement('span');
+      navTitle.className = 'nav-page-title';
+      const hamburgerBtn = document.getElementById('hamburger');
+      if (hamburgerBtn) hamburgerBtn.parentNode.insertBefore(navTitle, hamburgerBtn);
+    }
+    if (navTitle) navTitle.textContent = text;
+  }
+
+  const nav = document.querySelector('nav');
+
   if (openBtn) {
     openBtn.addEventListener('click', () => {
       contacts.classList.add('active');
       overlay.classList.add('active');
       document.body.style.overflow = 'hidden';
+
+      if (window.matchMedia('(max-width: 860px)').matches) {
+        const navTitle = document.querySelector('.nav-page-title');
+        if (navTitle) navTitle._origText = navTitle.textContent;
+        setNavTitle('Contact');
+        if (nav) nav.classList.add('contact-open');
+        if (hamburger) hamburger.classList.add('open'); // animate to ×
+      }
+
+      // Let contact slide in, then quietly close the pageNav overlay behind it
+      if (pageNav) {
+        setTimeout(() => {
+          pageNav.classList.remove('open');
+        }, 400);
+      }
     });
   }
 
   function closeContacts() {
+    contacts.style.transition = 'transform 0.8s cubic-bezier(0.4, 0, 0.6, 1), visibility 0s 0.8s';
     contacts.classList.remove('active');
     overlay.classList.remove('active');
     document.body.style.overflow = '';
+
+    if (window.matchMedia('(max-width: 860px)').matches) {
+      const navTitle = document.querySelector('.nav-page-title');
+      if (navTitle) setNavTitle(navTitle._origText || '');
+
+      // Snap nav bg dark immediately — page content is already dark behind the sliding panel
+      if (nav) {
+        nav.style.transition = 'none';
+        nav.classList.remove('contact-open');
+        void nav.offsetHeight;
+      }
+
+      // Snap span colour transitions so they don't go through a mid-tone
+      if (hamburger) {
+        hamburger.querySelectorAll('span').forEach(s => {
+          s.style.transition = 'transform 0.25s ease, opacity 0.25s ease';
+        });
+        setTimeout(() => { hamburger.classList.remove('open'); }, 560);
+      }
+    }
+
+    setTimeout(() => {
+      contacts.style.transition = '';
+      if (nav) nav.style.transition = '';
+      if (hamburger) {
+        hamburger.querySelectorAll('span').forEach(s => { s.style.transition = ''; });
+      }
+    }, 880);
   }
 
   if (closeBtn) closeBtn.addEventListener('click', closeContacts);
   overlay.addEventListener('click', closeContacts);
-}
 
-
-
-
-
-
-
-
-
-
-
-
-
-// 1. ALL imports at the top (Only once!)
-
-// 2. Select your HTML elements
-const addBtn = document.getElementById('add-project-btn');
-const modal = document.getElementById('project-modal');
-const saveBtn = document.getElementById('save-project');
-const loginBtn = document.getElementById('auth-btn');
-
-// 3. UI Logic: Show/Hide Add Project Form
-if (addBtn) {
-    addBtn.addEventListener('click', () => {
-        modal.style.display = 'block';
+  // Hamburger: closes contact panel if open, otherwise toggles nav overlay
+  if (hamburger && pageNav) {
+    hamburger.addEventListener('click', () => {
+      if (contacts.classList.contains('active')) {
+        closeContacts();
+        return;
+      }
+      hamburger.classList.toggle('open');
+      pageNav.classList.toggle('open');
     });
-}
+  }
 
-// 4. Action: Save New Project to Database
-if (saveBtn) {
-    saveBtn.addEventListener('click', async () => {
-        const title = document.getElementById('proj-title').value;
-        const desc = document.getElementById('proj-desc').value;
-
-
-        try {
-            await addDoc(collection(db, "projects"), {
-                title: title,
-                description: desc,
-                createdAt: new Date()
-            });
-            alert("Project Added!");
-            modal.style.display = 'none';
-        } catch (error) {
-            console.error("Error saving project: ", error);
+  // Animate pageNav closed before navigating (mobile only)
+  if (pageNav) {
+    pageNav.querySelectorAll('button[onclick]').forEach(btn => {
+      const match = btn.getAttribute('onclick').match(/location\.href=['"](.+)['"]/);
+      if (!match) return;
+      const href = match[1];
+      btn.removeAttribute('onclick');
+      btn.addEventListener('click', () => {
+        if (!window.matchMedia('(max-width: 860px)').matches) {
+          location.href = href;
+          return;
         }
-        // Inside your saveBtn.addEventListener...
-    alert("Project Added!");
-    modal.style.display = 'none';
-    displayProjects(); // <--- Add this line here!
+        // Navigate immediately — nav stays open as a curtain via sessionStorage
+        sessionStorage.setItem('nav-curtain', '1');
+        location.href = href;
+      });
     });
+  }
 }
 
-// 5. Action: Handle Login
-if (loginBtn) {
-    loginBtn.addEventListener('click', async () => {
-        const email = document.getElementById('login-email').value;
-        const pass = document.getElementById('login-pass').value;
 
-        try {
-            await signInWithEmailAndPassword(auth, email, pass);
-            document.getElementById('login-modal').style.display = 'none';
-            alert("Welcome back, Owner.");
-        } catch (error) {
-            alert("Access Denied: " + error.message);
-        }
+// Page transition: nav was held open as curtain, now slide it away
+if (document.documentElement.classList.contains('nav-curtain')) {
+  if (pageNav && hamburger) {
+    // Sync JS state with the already-open CSS state
+    pageNav.classList.add('open');
+    hamburger.classList.add('open');
+    // Re-enable transition, then slide closed
+    setTimeout(() => {
+      document.documentElement.classList.remove('nav-curtain');
+      hamburger.classList.remove('open');
+      pageNav.classList.remove('open');
+    }, 150);
+  }
+}
+
+// Category reordering — selected category items move to front
+const categoriesBar = document.querySelector('.categories');
+const gallery = document.querySelector('.gallery');
+
+// Fix categories position on desktop — wait for fonts/images to load for accurate coords
+if (categoriesBar && gallery && !window.matchMedia('(max-width: 860px)').matches) {
+  window.addEventListener('load', () => {
+    const rect = categoriesBar.getBoundingClientRect();
+    const width = categoriesBar.offsetWidth;
+    categoriesBar.style.position = 'fixed';
+    categoriesBar.style.top = rect.top + 'px';
+    categoriesBar.style.left = rect.left + 'px';
+    categoriesBar.style.width = width + 'px';
+    gallery.style.marginLeft = (width + 24) + 'px';
+  });
+}
+
+if (categoriesBar && gallery) {
+  const catButtons = categoriesBar.querySelectorAll('button');
+  const CATS = ['illustration', 'animation', 'design'];
+
+  const navTitle = document.querySelector('.nav-page-title');
+  let hasScrolled = false;
+
+  function updateActiveCat() {
+    const viewportCenter = window.innerHeight / 2;
+    let closestItem = null;
+    let minDist = Infinity;
+
+    Array.from(gallery.children).forEach(el => {
+      const r = el.getBoundingClientRect();
+      if (r.bottom <= 0 || r.top >= window.innerHeight) return;
+      const dist = Math.abs((r.top + r.bottom) / 2 - viewportCenter);
+      if (dist < minDist) { minDist = dist; closestItem = el; }
     });
+
+    const cat = closestItem ? CATS.find(c => closestItem.classList.contains(c)) : null;
+
+    catButtons.forEach(btn => {
+      btn.classList.toggle('active', !!cat && btn.textContent.trim().toLowerCase() === cat);
+    });
+
+    // Only update nav title after user has started scrolling
+    if (hasScrolled && navTitle) {
+      navTitle.textContent = cat
+        ? 'Project – ' + cat.charAt(0).toUpperCase() + cat.slice(1)
+        : 'Project';
+    }
+  }
+
+  // Scroll drives bold and title
+  window.addEventListener('scroll', () => {
+    hasScrolled = true;
+    updateActiveCat();
+  }, { passive: true });
+  updateActiveCat(); // set correct bold state on page load (title stays "Project")
+
+  catButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const category = btn.textContent.trim().toLowerCase();
+      const first = gallery.querySelector('.' + category);
+      if (first) {
+        const top = first.getBoundingClientRect().top + window.scrollY;
+        const navH = window.matchMedia('(max-width: 860px)').matches
+          ? (document.querySelector('nav')?.offsetHeight || 56) : 0;
+        window.scrollTo({ top: top - navH, behavior: 'smooth' });
+      }
+
+      // Update title immediately on click
+      hasScrolled = true;
+      if (navTitle) navTitle.textContent = 'Project – ' + btn.textContent.trim();
+    });
+  });
 }
 
-// 6. Security Guard: Toggle interface based on login status
-onAuthStateChanged(auth, (user) => {
-    const adminElements = document.querySelectorAll('.owner-only');
-    const loginStatus = document.getElementById('login-status');
+// Mobile category: show on scroll up / at top, hide on scroll down
+const categoriesSidebar = document.querySelector('.categories');
+const projectsSection = document.querySelector('.projects');
 
-    if (user) {
-        adminElements.forEach(el => el.style.display = 'block');
-        console.log("Logged in as:", user.email);
-        if (loginStatus) {
-            loginStatus.textContent = `Logged in as ${user.email} · Click to logout`;
-            loginStatus.onclick = () => {
-                auth.signOut();
-            };
-        }
+if (categoriesSidebar && window.matchMedia('(max-width: 860px)').matches) {
+  // Lock sticky top to the categories' initial position on screen
+  const initialTop = categoriesSidebar.getBoundingClientRect().top;
+  categoriesSidebar.style.top = initialTop + 'px';
+
+  let lastY = window.scrollY;
+
+  window.addEventListener('scroll', () => {
+    const currentY = window.scrollY;
+
+    if (currentY <= 10 || currentY < lastY) {
+      categoriesSidebar.classList.remove('cats-hidden');
+      if (projectsSection) projectsSection.classList.add('sidebar-on');
     } else {
-        adminElements.forEach(el => el.style.display = 'none');
-        console.log("Not logged in");
-        if (loginStatus) {
-            loginStatus.textContent = '© 2026 Your Portfolio · Click to login';
-            loginStatus.onclick = () => {
-                document.getElementById('login-modal').style.display = 'flex';
-            };
-        }
+      categoriesSidebar.classList.add('cats-hidden');
+      if (projectsSection) projectsSection.classList.remove('sidebar-on');
     }
-});
 
-
-
-
-
-
-
-// Function to fetch and display projects
-async function displayProjects() {
-    const projectGrid = document.getElementById('projects-grid');
-    
-    // 1. Clear the grid (in case there's old data)
-    projectGrid.innerHTML = "Loading projects...";
-
-    try {
-        // 2. Get the collection, ordered by the newest first
-        const q = query(collection(db, "projects"), orderBy("createdAt", "desc"));
-        const querySnapshot = await getDocs(q);
-        
-        projectGrid.innerHTML = ""; // Clear the loading text
-
-        // 3. Loop through each project in Firebase
-        querySnapshot.forEach((doc) => {
-            const project = doc.data();
-            
-            // 4. Create the HTML for each project card
-            const projectHTML = `
-                <div class="project-card" id="${doc.id}">
-                    <div class="project-info">
-                        <h3>${project.title}</h3>
-                        <p>${project.description}</p>
-                    </div>
-                    <button class="owner-only delete-btn" style="display:none;" onclick="deleteProject('${doc.id}')">Delete</button>
-                </div>
-            `;
-            
-            projectGrid.innerHTML += projectHTML;
-        });
-    } catch (error) {
-        console.error("Error loading projects: ", error);
-        projectGrid.innerHTML = "Failed to load projects.";
-    }
+    lastY = currentY;
+  }, { passive: true });
 }
 
-// Run this function immediately when the page loads
-displayProjects();
+
+// Gallery scroll-enlarge on mobile
+const galleryItems = document.querySelectorAll('.gallery > div');
+if (galleryItems.length && window.matchMedia('(max-width: 860px)').matches) {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      entry.target.classList.toggle('in-view', entry.isIntersecting);
+    });
+  }, { rootMargin: '-40% 0px -40% 0px', threshold: 0 });
+
+  galleryItems.forEach(item => observer.observe(item));
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
